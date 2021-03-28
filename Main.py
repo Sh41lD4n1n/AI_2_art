@@ -10,61 +10,47 @@ cv2.imwrite('output.jpg',im)'''
 import cv2 as cv
 import numpy as np
 W = 400
+
 def hexagon(img):
     l = 100
     x0 = 0
-    y0 = 300
-    '''ppt = np.array([[int(l/4+x0),int(l*(3**0.5-2)/4+y0)],
-                    [int(3*l/4+x0),int(l*(3**0.5-2)/4+y0)],
-                    [x0 + l, y0 - l / 2],
-                    [int(3 * l / 4 + x0), int(-l * (3 ** 0.5 + 2) / 4 + y0)],
-                    [int(l/4+x0),int(-l*(3**0.5+2)/4+y0)],
-                    [x0,int(y0-l/2)]],np.int32)'''
-    ppt = np.array([[int(l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
+    y0 = 0
+    for i in range(int(4*W/(l*6))+1):
+        ppt1 = np.array([[int(l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
                     [int(3 * l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
                     [x0 + l, y0 + l / 2],
                     [int(3 * l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
                     [int(l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
                     [x0, int(y0 + l / 2)]], np.int32)
-    print(ppt)
-    ppt = ppt.reshape((-1, 1, 2))
-    #cv.fillPoly(img, ppt, (0, 255, 255), 1)
-    #img = cv.fillPoly(img, ppt, (0, 255, 255),cv.LINE_4)
-    img = cv.fillConvexPoly(img, ppt, (0, 255, 255),cv.LINE_4)
+        ppt1 = ppt1.reshape((-1, 1, 2))
+        img = cv.fillConvexPoly(img, ppt1, (0, 255, 255), cv.LINE_4)
+        x0 = 6 * l / 4+ x0
+    #-----
+    '''l = 100
+    x0 = 6*l/4
+    y0 = 0
+    ppt2 = np.array([[int(l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
+                     [int(3 * l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
+                     [x0 + l, y0 + l / 2],
+                     [int(3 * l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
+                     [int(l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
+                     [x0, int(y0 + l / 2)]], np.int32)
+    ppt2 = ppt2.reshape((-1, 1, 2))
+    img = cv.fillConvexPoly(img, ppt2, (0, 255, 255),cv.LINE_4)'''
+    #----
+    l = 100
+    x0 = 3 * l / 4
+    y0 = l / 2
+    ppt3 = np.array([[int(l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
+                     [int(3 * l / 4 + x0), int(l * (-3 ** 0.5 + 2) / 4 + y0)],
+                     [x0 + l, y0 + l / 2],
+                     [int(3 * l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
+                     [int(l / 4 + x0), int(l * (3 ** 0.5 + 2) / 4 + y0)],
+                     [x0, int(y0 + l / 2)]], np.int32)
+    ppt3 = ppt3.reshape((-1, 1, 2))
+    img = cv.fillConvexPoly(img, ppt3, (0, 255, 255), cv.LINE_4)
     return img
-    #cv.polylines(img, [ppt], True, (255, 0, 255),thickness=8)
-def my_polygon(img):
-    line_type = 8
-    # Create some points
-    length = 100
 
-    '''ppt = np.array([[W / 4, W / 4],  [W / 4+length, W / 4+length]
-                       ], np.int32)'''
-    '''[W / 4+length, W / 4],,[W / 4, W / 4+length/2]
-                    [W / 4, W / 4+length],ppt = np.array([[W / 4, W / 4], [2 * W / 4,  W / 4],
-                    [2 * W / 4, 2*W / 4], [W /4, 2*W / 4]], np.int32)'''
-    '''ppt = np.array([[W / 4, 7 * W / 8], [3 * W / 4, 7 * W / 8],
-                    [3 * W / 4, 13 * W / 16], [11 * W / 16, 13 * W / 16]],np.int32)
-
-    [19 * W / 32, 3 * W / 8], [3 * W / 4, 3 * W / 8],
-                    [3 * W / 4, W / 8], [26 * W / 40, W / 8],
-                    [26 * W / 40, W / 4], [22 * W / 40, W / 4],
-                    [22 * W / 40, W / 8], [18 * W / 40, W / 8],
-                    [18 * W / 40, W / 4], [14 * W / 40, W / 4],
-                    [14 * W / 40, W / 8], [W / 4, W / 8],
-                    [W / 4, 3 * W / 8], [13 * W / 32, 3 * W / 8],
-                    [5 * W / 16, 13 * W / 16], [W / 4, 13 * W / 16]],'''
-
-    '''ppt = ppt.reshape((2, 1, 2))'''
-    img1 = cv.rectangle(img=img,
-                        rec = (int(W / 4-length/2), int(W / 4-length/2),length,length),
-                        color=(255, 100, 255),thickness =-1)
-    img1 = cv.rectangle(img=img,
-                        rec=(int(W / 4 + length/2+10),
-                             int(W / 4-length/2),length,length),
-                        color=(0, 0, 255), thickness=-1)
-    return img1
-    #cv.fillPoly(img, [ppt], (255, 100, 255), line_type)
 
 atom_window = "Drawing 1: Atom"
 rook_window = "Drawing 2: Rook"
@@ -73,9 +59,7 @@ size = W, W, 3
 atom_image = np.zeros(size, dtype=np.uint8)
 rook_image = np.zeros(size, dtype=np.uint8)
 hexagon(atom_image)
-my_polygon(rook_image)
-pts = np.array([[10,5],[20,30],[70,20],[50,10]], np.int32)
-pts = pts.reshape((-1,1,2))
+
 
 
 cv.imwrite('output1.jpg',atom_image)
