@@ -76,27 +76,6 @@ class Picture:
                 self.picture= cv.fillConvexPoly(self.picture, ppt1, (int(c1), int(c2), int(c3)), cv.LINE_4)
                 x0 = 6 * self.elem_size / 4 + self.elem_size / 5 + x0
 
-def crossover(Pict,otherPict):
-    chrom_size = int(Pict.num_of_row * Pict.num_of_colomn)
-    p1 = random.randint(0, chrom_size - 1)
-    p2 = random.randint(0, chrom_size - 1)
-    if p1>p2:
-        temp_p=p1
-        p1 = p2
-        p2=temp_p
-    for i in range(p1,p2):
-        temp = np.array([Pict.color_array.reshape((chrom_size,3))[i][0],
-                         Pict.color_array.reshape((chrom_size,3))[i][1],
-                         Pict.color_array.reshape((chrom_size,3))[i][2]],dtype=np.int32)
-        Pict.color_array.reshape((chrom_size, 3))[i][0] = otherPict.color_array.reshape((chrom_size, 3))[i][0]
-        Pict.color_array.reshape((chrom_size, 3))[i][1] = otherPict.color_array.reshape((chrom_size, 3))[i][1]
-        Pict.color_array.reshape((chrom_size, 3))[i][2] = otherPict.color_array.reshape((chrom_size, 3))[i][2]
-
-        otherPict.color_array.reshape((chrom_size, 3))[i][0] = temp[0]
-        otherPict.color_array.reshape((chrom_size, 3))[i][1] = temp[1]
-        otherPict.color_array.reshape((chrom_size, 3))[i][2] = temp[2]
-    Pict.fill_image_with_hexagons()
-    otherPict.fill_image_with_hexagons()
 
 # Create black empty images
 size = W, W, 3
