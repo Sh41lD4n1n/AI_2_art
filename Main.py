@@ -76,21 +76,41 @@ class Picture:
                 self.picture= cv.fillConvexPoly(self.picture, ppt1, (int(c1), int(c2), int(c3)), cv.LINE_4)
                 x0 = 6 * self.elem_size / 4 + self.elem_size / 5 + x0
 
+#[mem1...]
+def selection(population,original_pict):
+    winner=[]
+    losers=[]
+    while len(population)>0:
+        mem1=0
+        mem2=0
+        while mem1==mem2:
+            mem1 = random.randint(0, len(population)-1)
+            mem2 = random.randint(0, len(population)-1)
+        if (population[mem1].fit_function(original_pict)<population[mem2].fit_function(original_pict)):
+            winner.append(population[mem1])
+            losers.append(population[mem2])
+        else:
+            winner.append(population[mem2])
+            losers.append(population[mem1])
+        population.pop(mem1)
+        population.pop(mem2-1)
+    return winner,losers
 
+def algorithm(population):
+    pass
 # Create black empty images
 size = W, W, 3
 img = cv.imread('input.jpg')
 cv.imwrite('output2.jpg',img)
 chromosome1 = Picture(W,15)
-chromosome1.fit_function(img)
 chromosome2 = Picture(W,15)
-chromosome2.fit_function(img)
+#chromosome1.crossover(chromosome2)
+
 cv.imwrite('output1.jpg',chromosome1.picture)
 cv.imwrite('output2.jpg',chromosome2.picture)
-input()
-chromosome1.crossover(chromosome2)
-cv.imwrite('output1.jpg',chromosome1.picture)
-cv.imwrite('output2.jpg',chromosome2.picture)
+winner,loser = selection([chromosome1,chromosome2],img)
+print(winner[0].fit_function(img),loser[0].fit_function(img))
+
 #atom_image = np.zeros(size, dtype=np.uint8)
 #hexagon(atom_image)
 
