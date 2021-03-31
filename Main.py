@@ -19,7 +19,7 @@ class Picture:
     def fit_function(self,picture):
         if(picture.shape==self.picture.shape):
             result = (picture-self.picture)
-            fit = int(np.sum(a=result*result)**0.5)
+            fit = int(np.var(a=result)**0.5)
         else:
             fit = 0
         #print(fit)
@@ -32,30 +32,47 @@ class Picture:
             self.color_array[x][y]=np.random.randint(0,256,(3))
         self.fill_image_with_hexagons()
 
-    def crossover(Pict, otherPict):
-        chrom_size = int(Pict.num_of_row * Pict.num_of_colomn)
+    def crossover(self, otherPict):
+        child1 = Picture(self.pict_size,self.elem_size)
+        child2 = Picture(self.pict_size, self.elem_size)
+
+        chrom_size = int(self.num_of_row * self.num_of_colomn)
         p1 = random.randint(0, chrom_size - 1)
         p2 = random.randint(0, chrom_size - 1)
         if p1 > p2:
             temp_p = p1
             p1 = p2
             p2 = temp_p
+        for i in range(p1):
+            child2.color_array.reshape((chrom_size, 3))[i][0] = otherPict.color_array.reshape((chrom_size, 3))[i][0]
+            child2.color_array.reshape((chrom_size, 3))[i][1] = otherPict.color_array.reshape((chrom_size, 3))[i][1]
+            child2.color_array.reshape((chrom_size, 3))[i][2] = otherPict.color_array.reshape((chrom_size, 3))[i][2]
+
+            child1.color_array.reshape((chrom_size, 3))[i][0] = self.color_array.reshape((chrom_size, 3))[i][0]
+            child1.color_array.reshape((chrom_size, 3))[i][1] = self.color_array.reshape((chrom_size, 3))[i][1]
+            child1.color_array.reshape((chrom_size, 3))[i][2] = self.color_array.reshape((chrom_size, 3))[i][2]
         for i in range(p1, p2):
-            temp = np.array([Pict.color_array.reshape((chrom_size, 3))[i][0],
-                             Pict.color_array.reshape((chrom_size, 3))[i][1],
-                             Pict.color_array.reshape((chrom_size, 3))[i][2]], dtype=np.int32)
-            Pict.color_array.reshape((chrom_size, 3))[i][0] = otherPict.color_array.reshape((chrom_size, 3))[i][0]
-            Pict.color_array.reshape((chrom_size, 3))[i][1] = otherPict.color_array.reshape((chrom_size, 3))[i][1]
-            Pict.color_array.reshape((chrom_size, 3))[i][2] = otherPict.color_array.reshape((chrom_size, 3))[i][2]
+            child1.color_array.reshape((chrom_size, 3))[i][0] = otherPict.color_array.reshape((chrom_size, 3))[i][0]
+            child1.color_array.reshape((chrom_size, 3))[i][1] = otherPict.color_array.reshape((chrom_size, 3))[i][1]
+            child1.color_array.reshape((chrom_size, 3))[i][2] = otherPict.color_array.reshape((chrom_size, 3))[i][2]
 
-            otherPict.color_array.reshape((chrom_size, 3))[i][0] = temp[0]
-            otherPict.color_array.reshape((chrom_size, 3))[i][1] = temp[1]
-            otherPict.color_array.reshape((chrom_size, 3))[i][2] = temp[2]
-        Pict.fill_image_with_hexagons()
-        otherPict.fill_image_with_hexagons()
+            child2.color_array.reshape((chrom_size, 3))[i][0] = self.color_array.reshape((chrom_size, 3))[i][0]
+            child2.color_array.reshape((chrom_size, 3))[i][1] = self.color_array.reshape((chrom_size, 3))[i][1]
+            child2.color_array.reshape((chrom_size, 3))[i][2] = self.color_array.reshape((chrom_size, 3))[i][2]
+        for i in range(p2):
+            child2.color_array.reshape((chrom_size, 3))[i][0] = otherPict.color_array.reshape((chrom_size, 3))[i][0]
+            child2.color_array.reshape((chrom_size, 3))[i][1] = otherPict.color_array.reshape((chrom_size, 3))[i][1]
+            child2.color_array.reshape((chrom_size, 3))[i][2] = otherPict.color_array.reshape((chrom_size, 3))[i][2]
 
-    def show(self):
-        cv.imwrite('output1.jpg', self.picture)
+            child1.color_array.reshape((chrom_size, 3))[i][0] = self.color_array.reshape((chrom_size, 3))[i][0]
+            child1.color_array.reshape((chrom_size, 3))[i][1] = self.color_array.reshape((chrom_size, 3))[i][1]
+            child1.color_array.reshape((chrom_size, 3))[i][2] = self.color_array.reshape((chrom_size, 3))[i][2]
+        child1.fill_image_with_hexagons()
+        child2.fill_image_with_hexagons()
+        return child1,child2
+
+    def show(self,file_name):
+        cv.imwrite(file_name, self.picture)
 
     def fill_image_with_hexagons(self):
         for i in range(self.num_of_colomn):
@@ -81,11 +98,8 @@ def selection(population,original_pict):
     winner=[]
     losers=[]
     while len(population)>0:
-        mem1=0
-        mem2=0
-        while mem1==mem2:
-            mem1 = random.randint(0, len(population)-1)
-            mem2 = random.randint(0, len(population)-1)
+        mem1 = random.randint(0, len(population)-1)
+        mem2 = (random.randint(0, len(population)-1)+mem1)%len(population)
         if (population[mem1].fit_function(original_pict)<population[mem2].fit_function(original_pict)):
             winner.append(population[mem1])
             losers.append(population[mem2])
@@ -96,20 +110,45 @@ def selection(population,original_pict):
         population.pop(mem2-1)
     return winner,losers
 
-def algorithm(population):
-    pass
+def algorithm(population,image,gener_number):
+    #check fit function
+    min=population[0].fit_function(image)
+    imin = 0
+    for i in range(1,len(population)):
+        fit = population[i].fit_function(image)
+        print(fit)
+        if (fit<min):
+            min = fit
+            imin = i
+#    if(min<30 or gener_number>10):
+#        return population[imin]
+    part1,_=selection(population,image)
+    #perform crossover
+    for i in range(1,len(part1),2):
+        c1,c2=part1[i].crossover(part1[i - 1])
+        part1.append(c1)
+        part1.append(c2)
+    new_population,for_mutation=selection(part1,image)
+    for i in range(len(for_mutation)):
+        for_mutation[i].mutation()
+        new_population.append(for_mutation[i])
+    print(len(new_population))
+    for i in range(len(new_population)):
+        new_population[i].show(f"output{i}.jpg")
+
+
 # Create black empty images
 size = W, W, 3
-img = cv.imread('input.jpg')
-cv.imwrite('output2.jpg',img)
-chromosome1 = Picture(W,15)
-chromosome2 = Picture(W,15)
-#chromosome1.crossover(chromosome2)
+#img = cv.imread('input2.jpg')
+img = np.zeros(size)
+population = []
+for i in range(12):
+    population.append(Picture(W,15))
+#chromosome1 = Picture(W,15)
 
-cv.imwrite('output1.jpg',chromosome1.picture)
-cv.imwrite('output2.jpg',chromosome2.picture)
-winner,loser = selection([chromosome1,chromosome2],img)
-print(winner[0].fit_function(img),loser[0].fit_function(img))
+algorithm(population,img,0)
+outputim = np.zeros(size, dtype=np.uint8)
+cv.imwrite('outputf.jpg',outputim)
 
 #atom_image = np.zeros(size, dtype=np.uint8)
 #hexagon(atom_image)
