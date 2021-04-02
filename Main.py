@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import random
+from skimage.metrics  import structural_similarity as ssim
 W = 512
 class Picture:
     def __init__(self,pict_size,elem_size):
@@ -13,17 +14,17 @@ class Picture:
         self.num_of_row = int(4 * W / (self.elem_size * 6)) + 1
 
         # array of color of element
-        self.color_array=np.random.randint(0,256,(self.num_of_colomn,self.num_of_row,3),dtype=np.int32)
+        self.color_array=np.full((self.num_of_colomn,self.num_of_row,3),255) #np.random.randint(0,256,(self.num_of_colomn,self.num_of_row,3),dtype=np.int32)
         self.fill_image_with_hexagons()
-
+        self.fit_value=0
+    def __del__(self):
+        del self.picture
+        del self.color_array
     def fit_function(self,picture):
         if(picture.shape==self.picture.shape):
-            result = (picture-self.picture)
-            fit = int(np.var(a=result)**0.5)
+            self.fit_value = ssim(picture,self.picture,multichannel=True)#np.linalg.norm(np.absolute(picture-self.picture))
         else:
-            fit = 0
-        #print(fit)
-        return fit
+            self.fit_value = 0
     def mutation(self):
         number_of_modification = int(self.num_of_row*self.num_of_colomn*0.10)
         for i in range(number_of_modification):
@@ -94,13 +95,13 @@ class Picture:
                 x0 = 6 * self.elem_size / 4 + self.elem_size / 5 + x0
 
 #[mem1...]
-def selection(population,original_pict):
+def selection(population):
     winner=[]
     losers=[]
     while len(population)>0:
         mem1 = random.randint(0, len(population)-1)
         mem2 = (random.randint(0, len(population)-1)+mem1)%len(population)
-        if (population[mem1].fit_function(original_pict)<population[mem2].fit_function(original_pict)):
+        if (population[mem1].fit_value>population[mem2].fit_value):
             winner.append(population[mem1])
             losers.append(population[mem2])
         else:
@@ -109,46 +110,70 @@ def selection(population,original_pict):
         population.pop(mem1)
         population.pop(mem2-1)
     return winner,losers
-
-def algorithm(population,image,gener_number):
+def algorithm(population,image):
     #check fit function
-    min=population[0].fit_function(image)
+    min = 25
     imin = 0
-    for i in range(1,len(population)):
-        fit = population[i].fit_function(image)
+    gener_number=0
+    total_gener_number = 4000
+    while (min>0.8 or gener_number<total_gener_number):
+        print(f"generation{gener_number}")
+        gener_number = gener_number+1
+
+        for i in range(len(population)):
+            population[i].fit_function(image)
+
+        part1,remove_items=selection(population)
+        for i in range(len(remove_items)):
+            elem = remove_items.pop(0)
+            del elem
+        del remove_items
+        #perform crossover
+        for i in range(1,len(part1),2):
+            c1,c2=part1[i].crossover(part1[i - 1])
+            part1.append(c1)
+            part1.append(c2)
+        #mutation
+        population,for_mutation=selection(part1)
+        for i in range(len(part1)):
+            elem = part1.pop(0)
+            del elem
+        del part1
+        for i in range(len(for_mutation)):
+            for_mutation[i].mutation()
+            population.append(for_mutation[i])
+        del for_mutation
+        #show ten images
+        for i in range(10):
+            population[i].show(f"output{i}.jpg")
+
+        min = population[0].fit_value
+        imin = 0
+        for i in range(1, len(population)):
+            fit = population[i].fit_value
+            if (fit > min):
+                min = fit
+                imin = i
+        print(min)
+        population[imin].show("best_in_pop.jpg")
+    for i in range(len(population)):
+        fit = population[i].fit_value
         print(fit)
-        if (fit<min):
-            min = fit
-            imin = i
-#    if(min<30 or gener_number>10):
-#        return population[imin]
-    part1,_=selection(population,image)
-    #perform crossover
-    for i in range(1,len(part1),2):
-        c1,c2=part1[i].crossover(part1[i - 1])
-        part1.append(c1)
-        part1.append(c2)
-    new_population,for_mutation=selection(part1,image)
-    for i in range(len(for_mutation)):
-        for_mutation[i].mutation()
-        new_population.append(for_mutation[i])
-    print(len(new_population))
-    for i in range(len(new_population)):
-        new_population[i].show(f"output{i}.jpg")
+        population[i].show(f"output{i}.jpg")
+    population[imin].show("midle.jpg")
+
 
 
 # Create black empty images
 size = W, W, 3
-#img = cv.imread('input2.jpg')
-img = np.zeros(size)
+img = cv.imread('input2.jpg')
 population = []
-for i in range(12):
+#fit function calculated in some cases
+for i in range(100):
     population.append(Picture(W,15))
 #chromosome1 = Picture(W,15)
-
-algorithm(population,img,0)
-outputim = np.zeros(size, dtype=np.uint8)
-cv.imwrite('outputf.jpg',outputim)
+algorithm(population,img)
+#cv.imwrite('outputf.jpg',outputim)
 
 #atom_image = np.zeros(size, dtype=np.uint8)
 #hexagon(atom_image)
