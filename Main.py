@@ -4,7 +4,7 @@ import random
 from skimage.metrics  import structural_similarity as ssim
 W = 512
 class Picture:
-    def __init__(self,pict_size,elem_size):
+    def __init__(self,pict_size,elem_size,init_pict):
         self.elem_size = elem_size
         self.pict_size = pict_size
 
@@ -14,7 +14,14 @@ class Picture:
         self.num_of_row = int(4 * W / (self.elem_size * 6)) + 1
 
         # array of color of element
-        self.color_array=np.full((self.num_of_colomn,self.num_of_row,3),255) #np.random.randint(0,256,(self.num_of_colomn,self.num_of_row,3),dtype=np.int32)
+        self.color_array = np.full((self.num_of_colomn,self.num_of_row,3),245)
+        for i in range(self.num_of_colomn):
+            for j in range(self.num_of_row):
+                x = random.randint(0, W-1)
+                y = random.randint(0, W - 1)
+                self.color_array[i][j][0]=init_pict[x][y][0]
+                self.color_array[i][j][1] = init_pict[x][y][1]
+                self.color_array[i][j][2] = init_pict[x][y][2]
         self.fill_image_with_hexagons()
         self.fit_value=0
     def __del__(self):
@@ -25,17 +32,21 @@ class Picture:
             self.fit_value = ssim(picture,self.picture,multichannel=True)#np.linalg.norm(np.absolute(picture-self.picture))
         else:
             self.fit_value = 0
-    def mutation(self):
+    def mutation(self,init_pict):
         number_of_modification = int(self.num_of_row*self.num_of_colomn*0.10)
         for i in range(number_of_modification):
             x = random.randint(0,self.num_of_colomn-1)
             y = random.randint(0, self.num_of_row-1)
-            self.color_array[x][y]=np.random.randint(0,256,(3))
+            x1 = random.randint(0, W - 1)
+            y1 = random.randint(0, W - 1)
+            self.color_array[x][y][0] = init_pict[x1][y1][0]
+            self.color_array[x][y][1] = init_pict[x1][y1][1]
+            self.color_array[x][y][2] = init_pict[x1][y1][2]
         self.fill_image_with_hexagons()
 
-    def crossover(self, otherPict):
-        child1 = Picture(self.pict_size,self.elem_size)
-        child2 = Picture(self.pict_size, self.elem_size)
+    def crossover(self, otherPict,init_pict):
+        child1 = Picture(self.pict_size,self.elem_size,init_pict)
+        child2 = Picture(self.pict_size, self.elem_size,init_pict)
 
         chrom_size = int(self.num_of_row * self.num_of_colomn)
         p1 = random.randint(0, chrom_size - 1)
@@ -130,7 +141,7 @@ def algorithm(population,image):
         del remove_items
         #perform crossover
         for i in range(1,len(part1),2):
-            c1,c2=part1[i].crossover(part1[i - 1])
+            c1,c2=part1[i].crossover(part1[i - 1],image)
             part1.append(c1)
             part1.append(c2)
         #mutation
@@ -140,7 +151,7 @@ def algorithm(population,image):
             del elem
         del part1
         for i in range(len(for_mutation)):
-            for_mutation[i].mutation()
+            for_mutation[i].mutation(image)
             population.append(for_mutation[i])
         del for_mutation
         #show ten images
@@ -170,7 +181,7 @@ img = cv.imread('input2.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
-    population.append(Picture(W,15))
+    population.append(Picture(W,15,img))
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
