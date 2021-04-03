@@ -130,7 +130,7 @@ def algorithm(population,image):
     min = 25
     imin = 0
     gener_number=0
-    total_gener_number = 4000
+    total_gener_number = 6000
     while (min>0.8 or gener_number<total_gener_number):
         print(f"generation{gener_number}")
         gener_number = gener_number+1
