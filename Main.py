@@ -33,7 +33,7 @@ class Picture:
         else:
             self.fit_value = 0
     def mutation(self,init_pict):
-        number_of_modification = int(self.num_of_row*self.num_of_colomn*0.10)
+        number_of_modification = int(self.num_of_row*self.num_of_colomn*0.15)
         for i in range(number_of_modification):
             x = random.randint(0,self.num_of_colomn-1)
             y = random.randint(0, self.num_of_row-1)
@@ -111,7 +111,11 @@ def selection(population):
     losers=[]
     while len(population)>0:
         mem1 = random.randint(0, len(population)-1)
-        mem2 = (random.randint(0, len(population)-1)+mem1)%len(population)
+        b = []
+        for i in range(len(population)):
+            if i!=mem1:
+              b.append(i) 
+        mem2 = random.choice(b)
         if mem1>mem2:
             temp = mem2
             mem2 = mem1
@@ -185,7 +189,7 @@ img = cv.imread('input2.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
-    population.append(Picture(W,15,img))
+    population.append(Picture(W,30,img))
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
