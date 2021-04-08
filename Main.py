@@ -11,8 +11,7 @@ class Picture:
         self.picture = np.zeros((pict_size,pict_size,3), dtype=np.uint8)
 
         self.num_of_colomn = int(self.pict_size * 2 / (self.elem_size))
-        self.num_of_row = int(4 * W / (self.elem_size * 6)) + 1
-
+        self.num_of_row = int(4 * W / (self.elem_size * 6))
         # array of color of element
         self.color_array = np.full((self.num_of_colomn,self.num_of_row,3),245)
         for i in range(self.num_of_colomn):
@@ -34,14 +33,37 @@ class Picture:
             self.fit_value = 0
     def mutation(self,init_pict):
         number_of_modification = int(self.num_of_row*self.num_of_colomn*0.10)
+        '''squares = np.array([[i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5), self.elem_size * i / 2]
+                                   , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
+                                          self.elem_size * i / 2]
+                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5),
+                                          self.elem_size * i / 2 + self.elem_size]
+                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
+                                          self.elem_size * i / 2 + +self.elem_size]], np.int32)'''
         for i in range(number_of_modification):
-            x = random.randint(0,self.num_of_colomn-1)
-            y = random.randint(0, self.num_of_row-1)
-            x1 = random.randint(0, W - 1)
-            y1 = random.randint(0, W - 1)
-            self.color_array[x][y][0] = init_pict[x1][y1][0]
-            self.color_array[x][y][1] = init_pict[x1][y1][1]
-            self.color_array[x][y][2] = init_pict[x1][y1][2]
+            x = random.randint(0,self.num_of_row-1)
+            y = random.randint(0, self.num_of_colomn-1)
+            #print("-----")
+            #print(f"x = {x},num = {self.num_of_row}")
+            #print(f"y = {y},num = {self.num_of_colomn}")
+            left_x = x*(6 * self.elem_size / 4 + self.elem_size / 5) + (y%2)*(3 * self.elem_size / 4 + self.elem_size / 10)
+            left_y = y*self.elem_size / 2
+            #print(f"l_x = {left_x},l_y = {left_y}")
+
+            if (left_x+self.elem_size//W==0):
+                x1 = random.randint(left_x, left_x+self.elem_size)
+            else:
+                x1 = random.randint(left_x, W-1)
+
+            if (left_y + self.elem_size // W == 0):
+                y1 = random.randint(left_y, left_y + self.elem_size)
+            else:
+                y1 = random.randint(left_y, W - 1)
+
+            print(f"x1 = {x1},y1 = {y1}")
+            self.color_array[y][x][0] = init_pict[x1][y1][0]
+            self.color_array[y][x][1] = init_pict[x1][y1][1]
+            self.color_array[y][x][2] = init_pict[x1][y1][2]
         self.fill_image_with_hexagons()
 
     def crossover(self, otherPict,init_pict):
@@ -94,6 +116,15 @@ class Picture:
             else:
                 x0 = 3 * self.elem_size / 4 + self.elem_size / 10
             for j in range(self.num_of_row):
+                '''squares = np.array([[i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5), self.elem_size * i / 2]
+                                   , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
+                                          self.elem_size * i / 2]
+                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5),
+                                          self.elem_size * i / 2 + self.elem_size]
+                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
+                                          self.elem_size * i / 2 + +self.elem_size]], np.int32)'''
+                '''squares = np.array([[x0,y0],[x0+self.elem_size,y0]
+                                   ,[x0,y0+self.elem_size],[x0+self.elem_size,y0++self.elem_size]],np.int32)'''
                 ppt1 = np.array([[int(self.elem_size / 4 + x0), int(self.elem_size * (-3 ** 0.5 + 2) / 4 + y0)],
                                  [int(3 * self.elem_size / 4 + x0), int(self.elem_size * (-3 ** 0.5 + 2) / 4 + y0)],
                                  [x0 + self.elem_size, y0 + self.elem_size / 2],
@@ -103,6 +134,7 @@ class Picture:
                 ppt1 = ppt1.reshape((-1, 1, 2))
                 c1,c2,c3=self.color_array[i][j]
                 self.picture= cv.fillConvexPoly(self.picture, ppt1, (int(c1), int(c2), int(c3)), cv.LINE_4)
+                '''self.picture = cv.polylines(self.picture,[squares],True,(0,255,0))'''
                 x0 = 6 * self.elem_size / 4 + self.elem_size / 5 + x0
 
 #[mem1...]
