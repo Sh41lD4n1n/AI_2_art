@@ -112,6 +112,10 @@ def selection(population):
     while len(population)>0:
         mem1 = random.randint(0, len(population)-1)
         mem2 = (random.randint(0, len(population)-1)+mem1)%len(population)
+        if mem1>mem2:
+            temp = mem2
+            mem2 = mem1
+            mem1 = temp
         if (population[mem1].fit_value>population[mem2].fit_value):
             winner.append(population[mem1])
             losers.append(population[mem2])
@@ -126,7 +130,7 @@ def algorithm(population,image):
     min = 25
     imin = 0
     gener_number=0
-    total_gener_number = 4000
+    total_gener_number = 6000
     while (min>0.8 or gener_number<total_gener_number):
         print(f"generation{gener_number}")
         gener_number = gener_number+1
