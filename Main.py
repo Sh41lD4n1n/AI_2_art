@@ -60,7 +60,7 @@ class Picture:
             else:
                 y1 = random.randint(left_y, W - 1)
 
-            print(f"x1 = {x1},y1 = {y1}")
+            #print(f"x1 = {x1},y1 = {y1}")
             self.color_array[y][x][0] = init_pict[x1][y1][0]
             self.color_array[y][x][1] = init_pict[x1][y1][1]
             self.color_array[y][x][2] = init_pict[x1][y1][2]
