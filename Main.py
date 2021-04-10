@@ -12,6 +12,7 @@ class Picture:
 
         self.num_of_colomn = int(self.pict_size * 2 / (self.elem_size))
         self.num_of_row = int(4 * W / (self.elem_size * 6))
+
         # array of color of element
         self.color_array = np.full((self.num_of_colomn,self.num_of_row,3),245)
         for i in range(self.num_of_colomn):
@@ -32,35 +33,26 @@ class Picture:
         else:
             self.fit_value = 0
     def mutation(self,init_pict):
-        number_of_modification = int(self.num_of_row*self.num_of_colomn*0.10)
-        '''squares = np.array([[i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5), self.elem_size * i / 2]
-                                   , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
-                                          self.elem_size * i / 2]
-                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5),
-                                          self.elem_size * i / 2 + self.elem_size]
-                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
-                                          self.elem_size * i / 2 + +self.elem_size]], np.int32)'''
+        number_of_modification = int(self.num_of_row*self.num_of_colomn*0.15)
         for i in range(number_of_modification):
             x = random.randint(0,self.num_of_row-1)
             y = random.randint(0, self.num_of_colomn-1)
-            #print("-----")
-            #print(f"x = {x},num = {self.num_of_row}")
-            #print(f"y = {y},num = {self.num_of_colomn}")
-            left_x = x*(6 * self.elem_size / 4 + self.elem_size / 5) + (y%2)*(3 * self.elem_size / 4 + self.elem_size / 10)
-            left_y = y*self.elem_size / 2
-            #print(f"l_x = {left_x},l_y = {left_y}")
 
-            if (left_x+self.elem_size//W==0):
-                x1 = random.randint(left_x, left_x+self.elem_size)
+            left_x = int(x*(6*self.elem_size/4+self.elem_size/5)+(y%2)*(3*self.elem_size/4+self.elem_size/10))
+            left_y = int(y*self.elem_size/2)
+
+            if (left_x+self.elem_size)<W:
+                x1 = random.randint(left_x,left_x+self.elem_size)
             else:
-                x1 = random.randint(left_x, W-1)
-
-            if (left_y + self.elem_size // W == 0):
-                y1 = random.randint(left_y, left_y + self.elem_size)
+                if left_x>W:
+                    continue
+                x1 = random.randint(left_x,W-1)
+            if (left_y+self.elem_size)<W:
+                y1 = random.randint(left_y,left_y+self.elem_size)
             else:
-                y1 = random.randint(left_y, W - 1)
-
-            #print(f"x1 = {x1},y1 = {y1}")
+                if left_y>W:
+                    continue
+                y1 = random.randint(left_y,W-1)
             self.color_array[y][x][0] = init_pict[x1][y1][0]
             self.color_array[y][x][1] = init_pict[x1][y1][1]
             self.color_array[y][x][2] = init_pict[x1][y1][2]
@@ -116,15 +108,6 @@ class Picture:
             else:
                 x0 = 3 * self.elem_size / 4 + self.elem_size / 10
             for j in range(self.num_of_row):
-                '''squares = np.array([[i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5), self.elem_size * i / 2]
-                                   , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
-                                          self.elem_size * i / 2]
-                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5),
-                                          self.elem_size * i / 2 + self.elem_size]
-                                       , [i % 2*(3 * self.elem_size / 4 + self.elem_size / 10)+j*(6 * self.elem_size / 4 + self.elem_size / 5) + self.elem_size,
-                                          self.elem_size * i / 2 + +self.elem_size]], np.int32)'''
-                '''squares = np.array([[x0,y0],[x0+self.elem_size,y0]
-                                   ,[x0,y0+self.elem_size],[x0+self.elem_size,y0++self.elem_size]],np.int32)'''
                 ppt1 = np.array([[int(self.elem_size / 4 + x0), int(self.elem_size * (-3 ** 0.5 + 2) / 4 + y0)],
                                  [int(3 * self.elem_size / 4 + x0), int(self.elem_size * (-3 ** 0.5 + 2) / 4 + y0)],
                                  [x0 + self.elem_size, y0 + self.elem_size / 2],
@@ -134,7 +117,6 @@ class Picture:
                 ppt1 = ppt1.reshape((-1, 1, 2))
                 c1,c2,c3=self.color_array[i][j]
                 self.picture= cv.fillConvexPoly(self.picture, ppt1, (int(c1), int(c2), int(c3)), cv.LINE_4)
-                '''self.picture = cv.polylines(self.picture,[squares],True,(0,255,0))'''
                 x0 = 6 * self.elem_size / 4 + self.elem_size / 5 + x0
 
 #[mem1...]
@@ -146,7 +128,7 @@ def selection(population):
         b = []
         for i in range(len(population)):
             if i!=mem1:
-                b.append(i)
+              b.append(i)
         mem2 = random.choice(b)
         if mem1>mem2:
             temp = mem2
@@ -163,12 +145,18 @@ def selection(population):
     return winner,losers
 def algorithm(population,image):
     #check fit function
-    min = 25
+    file = open("result.txt", "a")
+    file.write(f"Elem_size {population[0].elem_size}")
+    file.close()
+    min = 0.1
     imin = 0
     gener_number=0
     total_gener_number = 6000
-    while (min>0.8 or gener_number<total_gener_number):
-        print(f"generation{gener_number}")
+
+    while (min<0.8 and gener_number<total_gener_number):
+        file = open("result.txt","a")
+        print(f"size 70 generation{gener_number}")
+        file.write(f"size 70 generation {gener_number}")
         gener_number = gener_number+1
 
         for i in range(len(population)):
@@ -198,30 +186,35 @@ def algorithm(population,image):
         for i in range(10):
             population[i].show(f"output{i}.jpg")
 
-        min = population[0].fit_value
-        imin = 0
         for i in range(1, len(population)):
             fit = population[i].fit_value
             if (fit > min):
                 min = fit
                 imin = i
         print(min)
+        file.write(f" {min} \n")
         population[imin].show("best_in_pop.jpg")
+        file.close()
+
+    file = open("result.txt","a")
     for i in range(len(population)):
         fit = population[i].fit_value
         print(fit)
+        file.write(f"| {fit} |")
         population[i].show(f"output{i}.jpg")
     population[imin].show("midle.jpg")
-
+    print(f"max = {min}")
+    file.write(f"max = {min} gen = {gener_number}")
+    file.close()
 
 
 # Create black empty images
 size = W, W, 3
-img = cv.imread('input2.jpg')
+img = cv.imread('input3.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
-    population.append(Picture(W,40,img))
+    population.append(Picture(W,50,img))
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
