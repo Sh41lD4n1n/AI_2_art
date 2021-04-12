@@ -214,7 +214,7 @@ img = cv.imread('input3.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
-    population.append(Picture(W,50,img))
+    population.append(Picture(W,40,img))
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
