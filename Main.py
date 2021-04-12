@@ -155,8 +155,13 @@ def algorithm(population,image):
 
     while (min<0.8 and gener_number<total_gener_number):
         file = open("result.txt","a")
+<<<<<<< HEAD
         print(f"size 40 pict3  generation{gener_number}")
         file.write(f"size 40 pict3 generation {gener_number}")
+=======
+        print(f"size 20 pict3  generation{gener_number}")
+        file.write(f"size 20 pict3 generation {gener_number}")
+>>>>>>> refs/remotes/origin/main
         gener_number = gener_number+1
 
         for i in range(len(population)):
@@ -214,7 +219,11 @@ img = cv.imread('input3.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
+<<<<<<< HEAD
     population.append(Picture(W,40,img))
+=======
+    population.append(Picture(W,20,img))
+>>>>>>> refs/remotes/origin/main
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
