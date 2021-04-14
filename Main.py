@@ -151,12 +151,12 @@ def algorithm(population,image):
     min = 0.1
     imin = 0
     gener_number=0
-    total_gener_number = 6000
+    total_gener_number = 5000
 
     while (min<0.8 and gener_number<total_gener_number):
         file = open("result.txt","a")
-        print(f"size 70 generation{gener_number}")
-        file.write(f"size 70 generation {gener_number}")
+        print(f"size 15 generation{gener_number}")
+        file.write(f"size 15 generation {gener_number}")
         gener_number = gener_number+1
 
         for i in range(len(population)):
@@ -191,6 +191,8 @@ def algorithm(population,image):
             if (fit > min):
                 min = fit
                 imin = i
+        population[imin].show("best_in_pop.jpg")
+
         print(min)
         file.write(f" {min} \n")
         population[imin].show("best_in_pop.jpg")
@@ -210,11 +212,11 @@ def algorithm(population,image):
 
 # Create black empty images
 size = W, W, 3
-img = cv.imread('input3.jpg')
+img = cv.imread('input5.jpg')
 population = []
 #fit function calculated in some cases
 for i in range(100):
-    population.append(Picture(W,40,img))
+    population.append(Picture(W,15,img))
 #chromosome1 = Picture(W,15)
 algorithm(population,img)
 #cv.imwrite('outputf.jpg',outputim)
